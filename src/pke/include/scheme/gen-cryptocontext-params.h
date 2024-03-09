@@ -130,6 +130,10 @@ class Params {
     usint firstModSize;
     usint scalingModSize;
 
+    // Rescaling parameter
+    usint compositeDegree;
+    usint registerWordSize;
+
     // see KeySwitchTechnique - number of digits in HYBRID key switching
     usint numLargeDigits;
 
@@ -210,6 +214,8 @@ public:
                 "maxRelinSkDeg",
                 "ksTech",
                 "scalTech",
+                "compositeDegree",
+                "registerWordSize",
                 "firstModSize",
                 "batchSize",
                 "numLargeDigits",
@@ -288,11 +294,17 @@ public:
     ScalingTechnique GetScalingTechnique() const {
         return scalTech;
     }
-    usint GetBatchSize() const {
-        return batchSize;
+    usint GetCompositeDegree() const {
+        return compositeDegree;
+    }
+    usint GetRegisterWordSize() const {
+        return registerWordSize;
     }
     usint GetFirstModSize() const {
         return firstModSize;
+    }
+    usint GetBatchSize() const {
+        return batchSize;
     }
     uint32_t GetNumLargeDigits() const {
         return numLargeDigits;
@@ -377,6 +389,12 @@ public:
     }
     void SetScalingTechnique(ScalingTechnique scalTech0) {
         scalTech = scalTech0;
+    }
+    void SetCompositeDegree(usint compositeDegree0) {
+        compositeDegree = compositeDegree0;
+    }
+    void SetRegisterWordSize(usint registerWordSize0) {
+        registerWordSize = registerWordSize0;
     }
     void SetBatchSize(usint batchSize0) {
         batchSize = batchSize0;

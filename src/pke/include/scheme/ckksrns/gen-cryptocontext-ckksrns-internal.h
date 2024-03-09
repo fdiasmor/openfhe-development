@@ -104,6 +104,8 @@ typename ContextGeneratorType::ContextType genCryptoContextCKKSRNSInternal(
         parameters.GetMaxRelinSkDeg(),
         parameters.GetKeySwitchTechnique(),
         parameters.GetScalingTechnique(),
+        parameters.GetCompositeDegree(),
+        parameters.GetRegisterWordSize(),
         parameters.GetEncryptionTechnique(),
         parameters.GetMultiplicationTechnique(),
         parameters.GetPREMode(),
