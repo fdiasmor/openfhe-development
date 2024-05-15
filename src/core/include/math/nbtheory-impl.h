@@ -188,7 +188,7 @@ IntType RootOfUnity(usint m, const IntType& modulo) {
             "satisfying the condition: (q-1)/m is an integer. The values of "
             "primeModulus = " +
             modulo.ToString() + " and m = " + std::to_string(m) + " do not satisfy this condition";
-        OPENFHE_THROW(math_error, errMsg);
+        OPENFHE_THROW(errMsg);
     }
 
     IntType gen    = FindGenerator(modulo);
@@ -326,11 +326,11 @@ void PrimeFactorize(IntType n, std::set<IntType>& primeFactors) {
 }
 
 template <typename IntType>
-IntType FirstPrime(uint32_t nBits, uint32_t m) {
+IntType FirstPrime(uint32_t nBits, uint64_t m) {
     if constexpr (std::is_same_v<IntType, NativeInteger>) {
         if (nBits > MAX_MODULUS_SIZE)
-            OPENFHE_THROW(config_error, std::string(__func__) + ": Requested bit length " + std::to_string(nBits) +
-                                            " exceeds maximum allowed length " + std::to_string(MAX_MODULUS_SIZE));
+            OPENFHE_THROW(std::string(__func__) + ": Requested bit length " + std::to_string(nBits) +
+                          " exceeds maximum allowed length " + std::to_string(MAX_MODULUS_SIZE));
     }
 
     IntType M(m);
@@ -341,17 +341,17 @@ IntType FirstPrime(uint32_t nBits, uint32_t m) {
         qNew += M;
     while (!MillerRabinPrimalityTest(qNew)) {
         if ((qNew += M) < q)
-            OPENFHE_THROW(math_error, std::string(__func__) + ": overflow growing candidate");
+            OPENFHE_THROW(std::string(__func__) + ": overflow growing candidate");
     }
     return qNew;
 }
 
 template <typename IntType>
-IntType LastPrime(uint32_t nBits, uint32_t m) {
+IntType LastPrime(uint32_t nBits, uint64_t m) {
     if constexpr (std::is_same_v<IntType, NativeInteger>) {
         if (nBits > MAX_MODULUS_SIZE)
-            OPENFHE_THROW(config_error, std::string(__func__) + ": Requested bit length " + std::to_string(nBits) +
-                                            " exceeds maximum allowed length " + std::to_string(MAX_MODULUS_SIZE));
+            OPENFHE_THROW(std::string(__func__) + ": Requested bit length " + std::to_string(nBits) +
+                          " exceeds maximum allowed length " + std::to_string(MAX_MODULUS_SIZE));
     }
 
     IntType M(m);
@@ -362,33 +362,32 @@ IntType LastPrime(uint32_t nBits, uint32_t m) {
         qNew -= M;
     while (!MillerRabinPrimalityTest(qNew)) {
         if ((qNew -= M) > q)
-            OPENFHE_THROW(math_error, std::string(__func__) + ": overflow shrinking candidate");
+            OPENFHE_THROW(std::string(__func__) + ": overflow shrinking candidate");
     }
 
     if (qNew.GetMSB() != nBits)
-        OPENFHE_THROW(config_error, std::string(__func__) + ": Requested " + std::to_string(nBits) +
-                                        " bits, but returned " + std::to_string(qNew.GetMSB()) +
-                                        ". Please adjust parameters.");
+        OPENFHE_THROW(std::string(__func__) + ": Requested " + std::to_string(nBits) + " bits, but returned " +
+                      std::to_string(qNew.GetMSB()) + ". Please adjust parameters.");
 
     return qNew;
 }
 
 template <typename IntType>
-IntType NextPrime(const IntType& q, uint32_t m) {
+IntType NextPrime(const IntType& q, uint64_t m) {
     IntType M(m), qNew(q + M);
     while (!MillerRabinPrimalityTest(qNew)) {
         if ((qNew += M) < q)
-            OPENFHE_THROW(math_error, std::string(__func__) + ": overflow growing candidate");
+            OPENFHE_THROW(std::string(__func__) + ": overflow growing candidate");
     }
     return qNew;
 }
 
 template <typename IntType>
-IntType PreviousPrime(const IntType& q, uint32_t m) {
+IntType PreviousPrime(const IntType& q, uint64_t m) {
     IntType M(m), qNew(q - M);
     while (!MillerRabinPrimalityTest(qNew)) {
         if ((qNew -= M) > q)
-            OPENFHE_THROW(math_error, std::string(__func__) + ": overflow shrinking candidate");
+            OPENFHE_THROW(std::string(__func__) + ": overflow shrinking candidate");
     }
     return qNew;
 }

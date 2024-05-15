@@ -444,9 +444,9 @@ public:
         if (part < m_PartQlHatInvModq.size() && sublvl < m_PartQlHatInvModq[part].size())
             return m_PartQlHatInvModq[part][sublvl];
 
-        OPENFHE_THROW(math_error,
-                      "CryptoParametersCKKS::GetPartitionQHatInvModQTable - "
-                      "index out of bounds.");
+        OPENFHE_THROW(
+            "CryptoParametersCKKS::GetPartitionQHatInvModQTable - "
+            "index out of bounds.");
     }
 
     /**
@@ -459,10 +459,10 @@ public:
         if (part < m_PartQlHatInvModqPrecon.size() && sublvl < m_PartQlHatInvModqPrecon[part].size())
             return m_PartQlHatInvModqPrecon[part][sublvl];
 
-        OPENFHE_THROW(math_error,
-                      "CryptoParametersCKKS::"
-                      "GetPartitionQHatInvModQPreconTable - index "
-                      "out of bounds.");
+        OPENFHE_THROW(
+            "CryptoParametersCKKS::"
+            "GetPartitionQHatInvModQPreconTable - index "
+            "out of bounds.");
     }
 
     /**
@@ -475,9 +475,9 @@ public:
         if (lvl < m_PartQlHatModp.size() && part < m_PartQlHatModp[lvl].size())
             return m_PartQlHatModp[lvl][part];
 
-        OPENFHE_THROW(math_error,
-                      "CryptoParametersCKKS::GetPartitionQHatModPTable - "
-                      "index out of bounds.");
+        OPENFHE_THROW(
+            "CryptoParametersCKKS::GetPartitionQHatModPTable - "
+            "index out of bounds.");
     }
 
     /**
@@ -490,9 +490,9 @@ public:
         if (lvl < m_modComplPartqBarrettMu.size() && part < m_modComplPartqBarrettMu[lvl].size())
             return m_modComplPartqBarrettMu[lvl][part];
 
-        OPENFHE_THROW(math_error,
-                      "CryptoParametersCKKS::GetPartitionPrecon - index out "
-                      "of bounds.");
+        OPENFHE_THROW(
+            "CryptoParametersCKKS::GetPartitionPrecon - index out "
+            "of bounds.");
     }
 
     /**
@@ -670,12 +670,12 @@ public:
     // BFVrns : Encrypt : POverQ
     /////////////////////////////////////
 
-    const NativeInteger GetNegQModt() const {
-        return m_negQModt;
+    const NativeInteger GetNegQModt(uint32_t i = 0) const {
+        return m_negQModt[i];
     }
 
-    const NativeInteger GetNegQModtPrecon() const {
-        return m_negQModtPrecon;
+    const NativeInteger GetNegQModtPrecon(uint32_t i = 0) const {
+        return m_negQModtPrecon[i];
     }
 
     const NativeInteger GetNegQrModt() const {
@@ -774,6 +774,14 @@ public:
 
     const std::vector<NativeInteger>& GetmNegRlQHatInvModqPrecon(usint l = 0) const {
         return m_negRlQHatInvModqPrecon[l];
+    }
+
+    const std::vector<NativeInteger>& GetmNegRlQlHatInvModq(usint l = 0) const {
+        return m_negRlQlHatInvModq[l];
+    }
+
+    const std::vector<NativeInteger>& GetmNegRlQlHatInvModqPrecon(usint l = 0) const {
+        return m_negRlQlHatInvModqPrecon[l];
     }
 
     const std::vector<std::vector<NativeInteger>>& GetqInvModr() const {
@@ -1513,8 +1521,8 @@ protected:
     // BFVrns : Encrypt
     /////////////////////////////////////
 
-    NativeInteger m_negQModt;
-    NativeInteger m_negQModtPrecon;
+    std::vector<NativeInteger> m_negQModt;
+    std::vector<NativeInteger> m_negQModtPrecon;
     std::vector<NativeInteger> m_tInvModq;
     std::vector<NativeInteger> m_tInvModqPrecon;
     std::vector<NativeInteger> m_tInvModqr;
@@ -1628,6 +1636,10 @@ protected:
     std::vector<std::vector<NativeInteger>> m_negRlQHatInvModq;
 
     std::vector<std::vector<NativeInteger>> m_negRlQHatInvModqPrecon;
+
+    std::vector<std::vector<NativeInteger>> m_negRlQlHatInvModq;
+
+    std::vector<std::vector<NativeInteger>> m_negRlQlHatInvModqPrecon;
 
     std::vector<std::vector<NativeInteger>> m_qInvModr;
 
@@ -1811,7 +1823,7 @@ public:
         if (version > SerializedVersion()) {
             std::string errMsg("serialized object version " + std::to_string(version) +
                                " is from a later version of the library");
-            OPENFHE_THROW(deserialize_error, errMsg);
+            OPENFHE_THROW(errMsg);
         }
         ar(cereal::base_class<CryptoParametersRLWE<DCRTPoly>>(this));
         ar(cereal::make_nvp("ks", m_ksTechnique));
@@ -1821,7 +1833,14 @@ public:
         ar(cereal::make_nvp("dnum", m_numPartQ));
         ar(cereal::make_nvp("ab", m_auxBits));
         ar(cereal::make_nvp("eb", m_extraBits));
-        ar(cereal::make_nvp("ccl", m_MPIntBootCiphertextCompressionLevel));
+        // try-catch is used for backwards compatibility down to 1.0.x
+        // m_MPIntBootCiphertextCompressionLevel was added in v1.1.0
+        try {
+            ar(cereal::make_nvp("ccl", m_MPIntBootCiphertextCompressionLevel));
+        }
+        catch (cereal::Exception&) {
+            m_MPIntBootCiphertextCompressionLevel = COMPRESSION_LEVEL::SLACK;
+        }
         ar(cereal::make_nvp("cd", m_compositeDegree));
         ar(cereal::make_nvp("rwsz", m_registerWordSize));
     }

@@ -56,7 +56,6 @@ protected:
         int plaintextModulus = 2;
         usint ringDimension  = 1024;
         usint digitSize      = 1;
-        usint dcrtbits       = 0;
 
         usint qmodulus  = 27;
         usint firstqmod = 27;
@@ -66,7 +65,6 @@ protected:
         if (security_model == 0) {
             ringDimension = 1024;
             digitSize     = 9;
-            dcrtbits      = 0;
 
             qmodulus  = 27;
             firstqmod = 27;
@@ -75,8 +73,7 @@ protected:
         }
         else if (security_model == 1) {
             ringDimension = 2048;
-            digitSize     = 18;
-            dcrtbits      = 0;
+            digitSize     = 16;
 
             qmodulus  = 54;
             firstqmod = 54;
@@ -86,7 +83,6 @@ protected:
         else if (security_model == 2) {
             ringDimension = 8192;
             digitSize     = 1;
-            dcrtbits      = 30;
 
             qmodulus  = 218;
             firstqmod = 60;
@@ -96,7 +92,6 @@ protected:
         else if (security_model == 3) {
             ringDimension = 8192;
             digitSize     = 0;
-            dcrtbits      = 30;
 
             qmodulus      = 218;
             firstqmod     = 60;
@@ -110,9 +105,9 @@ protected:
         parameters.SetPlaintextModulus(plaintextModulus);
         parameters.SetRingDim(ringDimension);
         parameters.SetFirstModSize(firstqmod);
-        parameters.SetScalingModSize(dcrtbits);
         parameters.SetDigitSize(digitSize);
         parameters.SetScalingTechnique(FIXEDMANUAL);
+        parameters.SetMultipartyMode(NOISE_FLOODING_MULTIPARTY);
         parameters.SetMultiHopModSize(qmodulus);
 
         CryptoContext<DCRTPoly> cryptoContext = GenCryptoContext(parameters);
@@ -131,7 +126,7 @@ protected:
         keyPair1 = cryptoContext->KeyGen();
 
         if (!keyPair1.good()) {
-            OPENFHE_THROW(math_error, "Key generation failed!");
+            OPENFHE_THROW("Key generation failed!");
         }
 
         ////////////////////////////////////////////////////////////
@@ -207,7 +202,7 @@ protected:
                     reEncryptedCT = cryptoContext->ModReduce(reEncryptedCT1);  // mod reduction for noise flooding
                     break;
                 default:
-                    OPENFHE_THROW(config_error, "Not a valid security mode");
+                    OPENFHE_THROW("Not a valid security mode");
             }
 
             reEncryptedCTs.push_back(reEncryptedCT);
@@ -226,7 +221,7 @@ protected:
         for (unsigned int j = 0; j < unpackedPT.size(); j++) {
             EXPECT_EQ(unpackedPT[j], unpackedDecPT[j]);
             if (unpackedPT[j] != unpackedDecPT[j]) {
-                OPENFHE_THROW(math_error, "Decryption failure");
+                OPENFHE_THROW("Decryption failure");
             }
         }
 

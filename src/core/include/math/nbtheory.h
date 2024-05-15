@@ -151,7 +151,7 @@ inline usint ReverseBits(usint num, usint msb) {
                    shift_trick[msb & 0x7];
         default:
             return -1;
-            // OPENFHE_THROW(math_error, "msbb value not handled:" +
+            // OPENFHE_THROW("msbb value not handled:" +
             // std::to_string(msbb));
     }
 }
@@ -163,7 +163,9 @@ inline usint ReverseBits(usint num, usint msb) {
  *
  * @return the index of the MSB bit location.
  */
-template <typename T, std::enable_if_t<std::is_integral_v<T>, bool> = true>
+template <
+    typename T,
+    std::enable_if_t<std::is_integral_v<T> || std::is_same_v<T, int128_t> || std::is_same_v<T, uint128_t>, bool> = true>
 inline constexpr usint GetMSB(T x) {
     if constexpr (sizeof(T) <= 8) {
         if (x == 0)
@@ -187,7 +189,7 @@ inline constexpr usint GetMSB(T x) {
     }
 #endif
     else {
-        OPENFHE_THROW(math_error, "Unsupported int type (GetMSB() supports 32-, 64- and 128-bit integers only)");
+        OPENFHE_THROW("Unsupported int type (GetMSB() supports 32-, 64- and 128-bit integers only)");
         return 0;
     }
 }
@@ -276,7 +278,7 @@ void PrimeFactorize(IntType n, std::set<IntType>& primeFactors);
  * @return the first prime modulus.
  */
 template <typename IntType>
-IntType FirstPrime(uint32_t nBits, uint32_t m);
+IntType FirstPrime(uint32_t nBits, uint64_t m);
 
 /**
  * Finds the max prime q that satisfies q = 1 mod m with at most nBits bits.
@@ -287,7 +289,7 @@ IntType FirstPrime(uint32_t nBits, uint32_t m);
  * @return the last prime modulus
  */
 template <typename IntType>
-IntType LastPrime(uint32_t nBits, uint32_t m);
+IntType LastPrime(uint32_t nBits, uint64_t m);
 
 /**
  * Finds the next prime that satisfies q = 1 mod m
@@ -299,7 +301,7 @@ IntType LastPrime(uint32_t nBits, uint32_t m);
  * @return the next prime modulus.
  */
 template <typename IntType>
-IntType NextPrime(const IntType& q, uint32_t m);
+IntType NextPrime(const IntType& q, uint64_t m);
 
 /**
  * Finds the previous prime that satisfies q = 1 mod m
@@ -311,7 +313,7 @@ IntType NextPrime(const IntType& q, uint32_t m);
  * @return the previous prime modulus.
  */
 template <typename IntType>
-IntType PreviousPrime(const IntType& q, uint32_t m);
+IntType PreviousPrime(const IntType& q, uint64_t m);
 
 /**
  * Multiplicative inverse for primitive unsigned integer data types
